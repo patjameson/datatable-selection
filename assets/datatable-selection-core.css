@@ -1,0 +1,11 @@
+.yui3-datatable-rows-selected {
+    background-color: yellow !important;
+}
+
+.yui3-datatable-cols-selected {
+    background-color: yellow !important;
+}
+
+.yui3-datatable-cells-selected {
+    background-color: yellow !important;
+}

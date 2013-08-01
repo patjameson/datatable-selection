@@ -1,0 +1,17 @@
+{
+    "name": "datatable-selection",
+    "builds": {
+        "datatable-selection": {
+        	"config": {
+        		"requires": [
+        			"datatable",
+                    "event-hover"
+        		]
+        	},
+            "jsfiles": [
+                "datatable-selection.js"
+            ],
+            "skinnable": true
+        }
+    }
+}

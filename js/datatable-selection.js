@@ -77,7 +77,6 @@ datatableSelection.prototype = {
         if (selectingCells) {
             if (this._currentCellsDelegate) {
                 this._currentCellsDelegate.detach();
-                this._currentCellsCtrlDelegate.detatch();
             }
 
             this._currentCellsDelegate = this.delegate('click', 
@@ -162,11 +161,46 @@ datatableSelection.prototype = {
 
     },
 
-    _selectColsClick: function(e) {
-        var colName = this._colNameRegex.exec(e.currentTarget.getAttribute('class')),
-            selector = this._colSelector + colName[1];
+    _selectedCols: [],
+    _lastColIndex: -1,
 
-        this.view.tableNode.all(selector).toggleClass(this._colsSelectedCSS);
+    _selectColsClick: function(e) {
+        var target = e.currentTarget,
+            colIndex = target.get('cellIndex'),
+            rowIndex = target.get('parentNode.rowIndex') - 2,
+            colName = this._colNameRegex.exec(e.currentTarget.getAttribute('class')),
+            selector = this._colSelector + colName[1],
+            i = 0;
+
+        if (!e.altKey) {
+            this.view.tableNode.all('tr td').removeClass(this._colsSelectedCSS);
+            this._selectedCols = [];
+        }
+
+        //clear selection that happens on shift-click
+        window.getSelection().removeAllRanges();
+
+        if (e.shiftKey && this._lastColIndex > -1) {
+            console.log('test');
+            var start = colIndex > this._lastColIndex ? this._lastColIndex : colIndex,
+                end = colIndex > this._lastColIndex ? colIndex : this._lastColIndex;
+
+            console.log(start + " " + end + " " + colIndex + " " + this._lastColIndex);
+            for (i = start;i <= end;i++) {
+                console.log(this.getColumn(i)._id);
+                this.view.tableNode.all(this._colSelector + this.getColumn(i)._id).addClass(this._colsSelectedCSS);
+                this._selectedCols[colIndex] = true;
+            }
+        } else {
+            this.view.tableNode.all(selector).toggleClass(this._colsSelectedCSS);
+
+            if (this._selectedCols[colIndex]) {
+                delete this._selectedCols[colIndex];
+            } else {
+                this._selectedCols[colIndex] = true;
+            }
+            this._lastColIndex = colIndex;
+        }
     },
     
     _selectRowsClick: function(e) {

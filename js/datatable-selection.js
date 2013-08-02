@@ -66,6 +66,7 @@ datatableSelection.prototype = {
         if (selectingCells) {
             if (this._currentCellsDelegate) {
                 this._currentCellsDelegate.detach();
+                this._currentCellsCtrlDelegate.detatch();
             }
 
             this._currentCellsDelegate = this.delegate('click', 
@@ -74,19 +75,50 @@ datatableSelection.prototype = {
         }
     },
 
+    _lastCellIndex: -1, 
+
     _selectCellsClick: function(e) {
         var target = e.currentTarget,
             colIndex = target.get('cellIndex'),
-            rowIndex = target.get('parentNode.rowIndex'),
-            numCols = this.get('columns').length;
-            cellIndex = numCols*(rowIndex-2) + colIndex;
+            rowIndex = target.get('parentNode.rowIndex') - 2,
+            numCols = this.get('columns').length,
+            cellIndex = numCols*rowIndex + colIndex;
         
-        target.toggleClass(this._cellsSelectedCSS);
-        
-        if (this._selectedCells[cellIndex]) {
-            delete this._selectedCells[cellIndex];
+        //clear selection that happens on shift-click
+        window.getSelection().removeAllRanges();
+
+        if (!e.altKey) {
+            this.view.tableNode.all('tr td').removeClass(this._cellsSelectedCSS);
+        }
+
+        if (e.shiftKey && this._lastCellIndex > -1) {
+            var direction = this._lastCellIndex > cellIndex,
+                start = direction ? cellIndex : this._lastCellIndex,
+                end = direction ? this._lastCellIndex : cellIndex,
+                rows = 0,
+                i = 0;
+
+            for (i = start;i <= end;i++) {
+                rows = Math.floor(i/numCols);
+                curRecord = this.getCell([rows, i - rows*numCols]);
+                this._selectedCells[i] = curRecord;
+                curRecord.addClass(this._cellsSelectedCSS);
+            }
+        } else if (e.shiftKey) {
+            target.toggleClass(this._cellsSelectedCSS);
+
+            this._lastCellIndex = cellIndex;
         } else {
-            this._selectedCells[cellIndex] = target;
+            target.toggleClass(this._cellsSelectedCSS);
+
+            if (this._selectedCells[cellIndex]) {
+                delete this._selectedCells[cellIndex];
+            } else {
+                this._selectedCells[cellIndex] = target;
+                console.log(target);
+            }
+
+            this._lastCellIndex = cellIndex;
         }
     },
 
@@ -102,6 +134,6 @@ datatableSelection.prototype = {
     }
 };
 
-Y.DataTable.select = datatableSelection;
+Y.DataTable.Selection = datatableSelection;
 
-Y.Base.mix(Y.DataTable, [Y.DataTable.select]);
+Y.Base.mix(Y.DataTable, [Y.DataTable.Selection]);

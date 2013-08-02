@@ -181,13 +181,10 @@ datatableSelection.prototype = {
         window.getSelection().removeAllRanges();
 
         if (e.shiftKey && this._lastColIndex > -1) {
-            console.log('test');
             var start = colIndex > this._lastColIndex ? this._lastColIndex : colIndex,
                 end = colIndex > this._lastColIndex ? colIndex : this._lastColIndex;
 
-            console.log(start + " " + end + " " + colIndex + " " + this._lastColIndex);
             for (i = start;i <= end;i++) {
-                console.log(this.getColumn(i)._id);
                 this.view.tableNode.all(this._colSelector + this.getColumn(i)._id).addClass(this._colsSelectedCSS);
                 this._selectedCols[colIndex] = true;
             }
@@ -203,8 +200,39 @@ datatableSelection.prototype = {
         }
     },
     
+    _selectedRows: [],
+    _lastRowIndex: -1,
+
     _selectRowsClick: function(e) {
-        e.currentTarget.all('td').toggleClass(this._rowsSelectedCSS);
+        var target = e.currentTarget,
+            rowIndex = target.get('rowIndex') - 2;
+
+        if (!e.altKey) {
+            this.view.tableNode.all('td').removeClass(this._rowsSelectedCSS);
+            this._selectedCols = [];
+        }
+
+        //clear selection that happens on shift-click
+        window.getSelection().removeAllRanges();
+        
+        if (e.shiftKey && this._lastRowIndex > -1) {
+            var start = rowIndex > this._lastRowIndex ? this._lastRowIndex : rowIndex,
+                end = rowIndex > this._lastRowIndex ? rowIndex : this._lastRowIndex;
+
+            for (i = start;i <= end;i++) {
+                this.getRow(i).all('td').addClass(this._rowsSelectedCSS);
+                this._selectedRows[rowIndex] = true;
+            }
+        } else {
+            target.all('td').toggleClass(this._rowsSelectedCSS);
+
+            if (this._selectedRows[rowIndex]) {
+                delete this._selectedRows[rowIndex];
+            } else {
+                this._selectedRows[rowIndex] = true;
+            }
+            this._lastRowIndex = rowIndex;
+        }
     }
 };
 

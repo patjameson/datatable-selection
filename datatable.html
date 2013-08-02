@@ -2,7 +2,7 @@
     <head>
         <script src="http://yui.yahooapis.com/3.11.0/build/yui/yui-min.js"></script>
         <script src="datatable-selection/datatable-selection.js"></script>
-        <link rel="stylesheet" href="datatable-selection/assets/datatable-selection-core.css">
+        <link rel="stylesheet" href="datatable-selection/assets/skins/sam/datatable-selection-skin.css">
         <script type="text/javascript">
             YUI().use('datatable-selection', function (Y) {
                 // Columns must match data object property names
@@ -16,8 +16,8 @@
                     { id: "ga-3275", name: "gadget",   price: "$6.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99"  },
                     { id: "sp-1980", name: "sprocket", price: "$3.75", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25"  },
                     { id: "wi-1650", name: "widget",   price: "$4.25", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75"  },
-                    { id: "ga-1474", name: "gadget",   price: "$6.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99"  },
-                    { id: "sp-1985", name: "sprocket", price: "$3.75", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25"  },
+                    { id: "ga-1474", price: "$6.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99", cost: "$5.99"  },
+                    { id: "sp-1985", name: "sprocket", price: "$3.75", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25", cost: "$3.25",  cost: "$3.25", cost: "$3.25"  },
                     { id: "wi-1660", name: "widget",   price: "$4.25", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75", cost: "$3.75"  }
 
                 ];
@@ -28,7 +28,10 @@
                     caption: "My first DataTable!",
                     summary: "Example DataTable showing basic instantiation configuration",
 
+                    sortable: true,
+
                     selectableCells: true,
+                    selectionType: 'block', //'single' or 'range' or 'block'
                     //selectableCols: true,
                     //selectableRows: true
                 });

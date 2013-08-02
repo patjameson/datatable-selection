@@ -15,6 +15,11 @@ datatableSelection.ATTRS = {
         value: false,
         setter: '_setSelectableCells',
         validator: Y.Lang.isBoolean
+    },
+    selectionType: {
+        value: 'single',
+        setter: '_setSelectionType',
+        validator: Y.Lang.isString
     }
 };
 
@@ -28,6 +33,8 @@ datatableSelection.prototype = {
    
     _colNameRegex: /yui3-datatable-col-(\S*)/,
    
+    _selectionType: 'single',
+
     _currentRowsDelegate: null,
     _currentColsDelegate: null,
     _currentCellsDelegate: null,
@@ -36,6 +43,10 @@ datatableSelection.prototype = {
 
     getSelectedCells: function() {
         return _selectedCells;
+    },
+
+    _setSelectionType: function (type) {
+        this._selectionType = type;
     },
 
     _setSelectableRows: function (selectingRows) {
@@ -89,37 +100,66 @@ datatableSelection.prototype = {
 
         if (!e.altKey) {
             this.view.tableNode.all('tr td').removeClass(this._cellsSelectedCSS);
+            this._selectedCells = [];
         }
 
-        if (e.shiftKey && this._lastCellIndex > -1) {
-            var direction = this._lastCellIndex > cellIndex,
-                start = direction ? cellIndex : this._lastCellIndex,
-                end = direction ? this._lastCellIndex : cellIndex,
-                rows = 0,
-                i = 0;
+        target.toggleClass(this._cellsSelectedCSS);
 
-            for (i = start;i <= end;i++) {
-                rows = Math.floor(i/numCols);
-                curRecord = this.getCell([rows, i - rows*numCols]);
-                this._selectedCells[i] = curRecord;
-                curRecord.addClass(this._cellsSelectedCSS);
+        if (e.shiftKey && this._lastCellIndex > -1 && 
+                (this._selectionType === "range" || this._selectionType === "block")) {
+
+            if (this._selectionType === "range") {
+                var direction = this._lastCellIndex > cellIndex,
+                    start = direction ? cellIndex : this._lastCellIndex,
+                    end = direction ? this._lastCellIndex : cellIndex,
+                    rows = 0,
+                    i = 0;
+
+                for (i = start;i <= end;i++) {
+                    rows = Math.floor(i/numCols);
+                    curRecord = this.getCell([rows, i - rows*numCols]);
+                    this._selectedCells[i] = curRecord;
+                    curRecord.addClass(this._cellsSelectedCSS);
+                }
+            } else if (this._selectionType === "block") {
+                var row = 0,
+                    col = 0,
+                    startRow = Math.floor(cellIndex/numCols),
+                    endRow = Math.floor(this._lastCellIndex/numCols),
+                    startCol = cellIndex - startRow*numCols,
+                    endCol = this._lastCellIndex - endRow*numCols,
+                    temp = null;
+                
+                //switch the starts and ends for the for loop if needed.
+                if (startRow > endRow) {
+                    temp = startRow;
+                    startRow = endRow;
+                    endRow = temp;
+                }
+                if (startCol > endCol) {
+                    temp = startCol;
+                    startCol = endCol;
+                    endCol = temp; 
+                }
+
+                for (col = startCol;col <= endCol;col++) {
+                    for (row = startRow;row <= endRow;row++) {
+                        curRecord = this.getCell([row, col]);
+                        this._selectedCells[i] = curRecord;
+                        curRecord.addClass(this._cellsSelectedCSS);
+                    }
+                }
             }
-        } else if (e.shiftKey) {
-            target.toggleClass(this._cellsSelectedCSS);
-
-            this._lastCellIndex = cellIndex;
         } else {
-            target.toggleClass(this._cellsSelectedCSS);
-
             if (this._selectedCells[cellIndex]) {
                 delete this._selectedCells[cellIndex];
             } else {
                 this._selectedCells[cellIndex] = target;
-                console.log(target);
             }
 
             this._lastCellIndex = cellIndex;
         }
+
     },
 
     _selectColsClick: function(e) {

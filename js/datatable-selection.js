@@ -22,7 +22,7 @@ datatableSelection.prototype = {
     _cellsSelectedCSS: 'yui3-datatable-cells-selected',
     _colsSelectedCSS: 'yui3-datatable-cols-selected',
     _rowsSelectedCSS: 'yui3-datatable-rows-selected',
-    
+        
     //append the column id to this
     _colSelector: '.yui3-datatable-data .yui3-datatable-col-',
    
@@ -31,6 +31,12 @@ datatableSelection.prototype = {
     _currentRowsDelegate: null,
     _currentColsDelegate: null,
     _currentCellsDelegate: null,
+    
+    _selectedCells: [],
+
+    getSelectedCells: function() {
+        return _selectedCells;
+    },
 
     _setSelectableRows: function (selectingRows) {
         if (selectingRows) {
@@ -69,7 +75,19 @@ datatableSelection.prototype = {
     },
 
     _selectCellsClick: function(e) {
-        e.currentTarget.toggleClass(this._cellsSelectedCSS);
+        var target = e.currentTarget,
+            colIndex = target.get('cellIndex'),
+            rowIndex = target.get('parentNode.rowIndex'),
+            numCols = this.get('columns').length;
+            cellIndex = numCols*(rowIndex-2) + colIndex;
+        
+        target.toggleClass(this._cellsSelectedCSS);
+        
+        if (this._selectedCells[cellIndex]) {
+            delete this._selectedCells[cellIndex];
+        } else {
+            this._selectedCells[cellIndex] = target;
+        }
     },
 
     _selectColsClick: function(e) {

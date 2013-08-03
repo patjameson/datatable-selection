@@ -30,10 +30,21 @@
 
                     sortable: true,
 
-                    //selectableCells: true,
-                    //selectionType: 'block', //'single' or 'range' or 'block'
+                    selectableCells: true,
+                    selectionType: 'range', //'single' or 'range' or 'block'
                     //selectableCols: true,
-                    selectableRows: true
+                    //selectableRows: true
+                });
+
+                table.on('cellSelectionChange', function() {
+                    var selectedCells = table.getSelectedCells(),
+                        selectedHTML = ''; 
+
+                    for (var i = 0;i < selectedCells.length;i++) {
+                        selectedHTML += selectedCells[i].getContent() + '<br>';
+                    }
+
+                    Y.one('#selected').setHTML(selectedHTML);  
                 });
 
                 table.render("#example");
@@ -43,5 +54,6 @@
     </head>
     <body class="yui3-skin-sam">
         <div id="example"></div>
+        <div id="selected"></div>
     </body>
 </html>

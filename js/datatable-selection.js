@@ -39,10 +39,17 @@ datatableSelection.prototype = {
     _currentColsDelegate: null,
     _currentCellsDelegate: null,
     
-    _selectedCells: [],
+    _selectedCells: {},
 
     getSelectedCells: function() {
-        return _selectedCells;
+        var numCols = this.get('columns').length,
+            selectedCells = [];
+
+        for (var cellIndex in this._selectedCells) {
+            row = Math.floor(cellIndex / numCols);
+            selectedCells.push(this.getCell([row, cellIndex - row*numCols]));
+        }
+        return selectedCells;
     },
 
     _setSelectionType: function (type) {
@@ -99,7 +106,7 @@ datatableSelection.prototype = {
 
         if (!e.altKey) {
             this.view.tableNode.all('tr td').removeClass(this._cellsSelectedCSS);
-            this._selectedCells = [];
+            this._selectedCells = {};
         }
 
         target.toggleClass(this._cellsSelectedCSS);
@@ -117,7 +124,7 @@ datatableSelection.prototype = {
                 for (i = start;i <= end;i++) {
                     rows = Math.floor(i/numCols);
                     curRecord = this.getCell([rows, i - rows*numCols]);
-                    this._selectedCells[i] = curRecord;
+                    this._selectedCells[numCols*rows + (i - rows*numCols)] = curRecord;
                     curRecord.addClass(this._cellsSelectedCSS);
                 }
             } else if (this._selectionType === "block") {
@@ -144,7 +151,7 @@ datatableSelection.prototype = {
                 for (col = startCol;col <= endCol;col++) {
                     for (row = startRow;row <= endRow;row++) {
                         curRecord = this.getCell([row, col]);
-                        this._selectedCells[i] = curRecord;
+                        this._selectedCells[numCols*row + col] = curRecord;
                         curRecord.addClass(this._cellsSelectedCSS);
                     }
                 }
@@ -159,6 +166,7 @@ datatableSelection.prototype = {
             this._lastCellIndex = cellIndex;
         }
 
+        this.fire('cellSelectionChange');
     },
 
     _selectedCols: [],
@@ -198,6 +206,8 @@ datatableSelection.prototype = {
             }
             this._lastColIndex = colIndex;
         }
+
+        this.fire('colSelectionChange');
     },
     
     _selectedRows: [],
@@ -233,6 +243,8 @@ datatableSelection.prototype = {
             }
             this._lastRowIndex = rowIndex;
         }
+
+        this.fire('rowSelectionChange');
     }
 };
 
